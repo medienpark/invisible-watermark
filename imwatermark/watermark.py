@@ -5,8 +5,6 @@ import base64
 import cv2
 import numpy as np
 from .maxDct import EmbedMaxDct
-from .dwtDctSvd import EmbedDwtDctSvd
-from .rivaGan import RivaWatermark
 import pprint
 
 pp = pprint.PrettyPrinter(indent=2)
@@ -67,10 +65,6 @@ class WatermarkEncoder(object):
 
     def get_length(self):
         return self._wmLen
-
-    @classmethod
-    def loadModel(cls):
-        RivaWatermark.loadModel()
 
     def encode(self, cv2Image, method='dwtDct', **configs):
         (r, c, channels) = cv2Image.shape
@@ -156,16 +150,6 @@ class WatermarkDecoder(object):
         if method == 'dwtDct':
             embed = EmbedMaxDct(watermarks=[], wmLen=self._wmLen, **configs)
             bits = embed.decode(cv2Image)
-        elif method == 'dwtDctSvd':
-            embed = EmbedDwtDctSvd(watermarks=[], wmLen=self._wmLen, **configs)
-            bits = embed.decode(cv2Image)
-        elif method == 'rivaGan':
-            embed = RivaWatermark(watermarks=[], wmLen=self._wmLen, **configs)
-            bits = embed.decode(cv2Image)
         else:
             raise NameError('%s is not supported' % method)
-        return self.reconstruct(bits)
 
-    @classmethod
-    def loadModel(cls):
-        RivaWatermark.loadModel()
